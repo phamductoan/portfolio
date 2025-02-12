@@ -4,29 +4,25 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Vocabulary;
+use App\Http\Middleware\SecurityMiddleware;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Auth;
 
 class VocabularyController extends Controller
 {
-    /**
-     * Hiển thị biểu mẫu để thêm từ vựng mới.
-     *
-     * @return \Illuminate\View\View
-     */
+    
+    public function __construct()
+    {
+        $this->middleware('auth');  // Thêm middleware auth
+    }
+
     public function showForm()
     {
         return view('home');
     }
 
-    /**
-     * Xử lý việc thêm từ vựng mới vào cơ sở dữ liệu.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function addVocabulary(Request $request)
     {
-        // Xác thực dữ liệu đầu vào
         $request->validate([
             'japanese_text' => 'required|string|max:255',
             'kanji' => 'nullable|string|max:255',
@@ -35,27 +31,22 @@ class VocabularyController extends Controller
             'unit' => 'required|integer',
         ]);
 
-        // Tạo đối tượng từ vựng mới và lưu vào cơ sở dữ liệu
+        // Thêm user_id khi tạo vocabulary mới
         Vocabulary::create([
             'japanese_text' => $request->input('japanese_text'),
             'kanji' => $request->input('kanji') ?: null,
             'romaji' => $request->input('romaji'),
             'significance' => $request->input('significance'),
             'unit' => $request->input('unit'),
+            'user_id' => Auth::id()  // Thêm user_id của user đang đăng nhập
         ]);
 
-        // Chuyển hướng đến danh sách từ vựng với thông báo thành công
         return redirect()->route('vocabulary.index')->with('success', 'Vocabulary added successfully!');
     }
 
-    /**
-     * Hiển thị danh sách từ vựng.
-     *
-     * @return \Illuminate\View\View
-     */
     public function index(Request $request)
     {
-        $query = Vocabulary::query();
+        $query = Vocabulary::where('user_id', Auth::id());  // Chỉ lấy vocabulary của user hiện tại
     
         if ($request->has('search')) {
             $search = $request->input('search');
@@ -74,40 +65,40 @@ class VocabularyController extends Controller
 
     public function getUnits()
     {
-        // Lấy tất cả các unit duy nhất từ bảng vocabulary
-        $units = Vocabulary::distinct()->pluck('unit');
-
+        // Chỉ lấy units của user hiện tại
+        $units = Vocabulary::where('user_id', Auth::id())
+                          ->distinct()
+                          ->pluck('unit');
         return response()->json($units);
     }
 
     public function reading(Request $request)
     {
-        $units = $request->query('units'); // Lấy units từ query string
-
-        if ($units) {
-            $vocabularies = Vocabulary::whereIn('unit', explode(',', $units))->get();
-        } else {
-            $vocabularies = Vocabulary::all();
+        $query = Vocabulary::where('user_id', Auth::id());  // Chỉ lấy vocabulary của user hiện tại
+        
+        if ($request->has('units')) {
+            $units = explode(',', $request->query('units'));
+            $query->whereIn('unit', $units);
         }
 
+        $vocabularies = $query->get();
         return view('reading', ['vocabularies' => $vocabularies]);
     }
 
-    // Xem chi tiết từ vựng
     public function show($id)
     {
-        $vocabulary = Vocabulary::findOrFail($id);
+        $vocabulary = Vocabulary::where('user_id', Auth::id())  // Chỉ cho phép xem vocabulary của user hiện tại
+                               ->findOrFail($id);
         return view('show', ['vocabulary' => $vocabulary]);
     }
 
-      // Hiển thị biểu mẫu chỉnh sửa từ vựng
     public function edit($id)
     {
-        $vocabulary = Vocabulary::findOrFail($id);
+        $vocabulary = Vocabulary::where('user_id', Auth::id())  // Chỉ cho phép edit vocabulary của user hiện tại
+                               ->findOrFail($id);
         return view('edit', ['vocabulary' => $vocabulary]);
     }
 
-    // Cập nhật từ vựng
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -118,16 +109,17 @@ class VocabularyController extends Controller
             'kanji' => 'nullable|string|max:255'
         ]);
 
-        $vocabulary = Vocabulary::findOrFail($id);
+        $vocabulary = Vocabulary::where('user_id', Auth::id())  // Chỉ cho phép update vocabulary của user hiện tại
+                               ->findOrFail($id);
         $vocabulary->update($request->all());
 
         return redirect()->route('vocabulary.index')->with('success', 'Vocabulary updated successfully!');
     }
 
-    // Xóa từ vựng
     public function destroy($id)
     {
-        $vocabulary = Vocabulary::findOrFail($id);
+        $vocabulary = Vocabulary::where('user_id', Auth::id())  // Chỉ cho phép xóa vocabulary của user hiện tại
+                               ->findOrFail($id);
         $vocabulary->delete();
 
         return redirect()->route('vocabulary.index')->with('success', 'Vocabulary deleted successfully!');
@@ -135,7 +127,8 @@ class VocabularyController extends Controller
 
     public function export()
     {
-        $vocabularies = Vocabulary::all();
+        $vocabularies = Vocabulary::where('user_id', Auth::id())  // Chỉ export vocabulary của user hiện tại
+                                ->get();
 
         $csvHeader = ['ID', 'Japanese Text', 'Kanji', 'Romaji', 'Significance', 'Unit'];
         $csvData = [];
@@ -152,12 +145,8 @@ class VocabularyController extends Controller
         }
 
         $filename = "vocabularies_" . date('Y-m-d_H-i-s') . ".csv";
-
         $handle = fopen($filename, 'w+');
-
-        // Thêm BOM vào file để nhận diện UTF-8
         fputs($handle, $bom = (chr(0xEF) . chr(0xBB) . chr(0xBF)));
-
         fputcsv($handle, $csvHeader);
 
         foreach ($csvData as $row) {
