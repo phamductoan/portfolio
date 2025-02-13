@@ -1,115 +1,442 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
+<!-- coding Credit to  @_.codedevotee -->
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Đăng Nhập / Đăng Ký</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-  <style>
-    body {
-      background: #f7f7f7;
-    }
-    .card {
-      margin: 0 auto;
-      max-width: 400px;
-      margin-top: 50px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .toggle-btns {
-      text-align: center;
-      margin-top: 20px;
-    }
-    .toggle-btns button {
-      margin: 0 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Register form</title>
+
+    <!--Boxicons CDN-->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' 
+    rel='stylesheet'>
+
 </head>
+
 <body>
-  <div class="container">
-    <!-- Nút chuyển đổi giữa đăng nhập và đăng ký -->
-    <div class="toggle-btns">
-      <button id="btnLogin" class="btn btn-primary">Đăng Nhập</button>
-      <button id="btnRegister" class="btn btn-secondary">Đăng Ký</button>
+    <div class="wrapper">
+        <span class="rotate-bg"></span>
+        <span class="rotate-bg2"></span>
+
+        <div class="form-box login">
+            <h2 class="title animation" style="--i:0; --j:21">Login</h2>
+            <form action="{{ route('login') }}" method="POST">
+              @csrf
+              <!-- Hiển thị lỗi nếu có -->
+              @if($errors->has('email'))
+                <div class="alert alert-danger" style="color: red; text-align: center">
+                  {{ $errors->first('email') }}
+                </div>
+              @endif
+                <div class="input-box animation" style="--i:1; --j:22">
+                    <input type="email" name="email" required>
+                    <label for="">Email</label>
+                    <i class='bx bxs-user'></i>
+                </div>
+                <div class="input-box animation" style="--i:2; --j:23">
+                    <input type="password" name="password" required>
+                    <label for="">Password</label>
+                    <i class='bx bxs-lock-alt'></i>
+                </div>
+                <button type="submit" class="btn animation" style="--i:3; --j:24">Login</button>
+                <div class="linkTxt animation" style="--i:5; --j:25">
+                    <p>Don't have an account? <a href="#" class="register-link">Sign Up</a></p>
+                    <p>You can use a demo account</p>
+                    <p>Email: demo.gmail.com</p>
+                    <p>Password: demo123</p>
+                </div>
+            </form>
+        </div>
+        <div class="info-text login">
+            <h2 class="animation" style="--i:0; --j:20">Welcome Back!</h2>
+            <p class="animation" style="--i:1; --j:21">Your journey to mastering a new language starts here. Let's learn together.</p>
+        </div>
+
+        <div class="form-box register" style="display: none;">
+            <h2 class="title animation" style="--i:17; --j:0">Sign Up</h2>
+            <form action="{{ route('register') }}" method="POST">
+                @csrf
+                <div class="input-box animation" style="--i:18; --j:1">
+                    <input type="text" name="name" required>
+                    <label for="">Name</label>
+                    <i class='bx bxs-user'></i>
+                </div>
+                <div class="input-box animation" style="--i:19; --j:2">
+                    <input type="email" name="email" required>
+                    <label for="">Email</label>
+                    <i class='bx bxs-envelope'></i>
+                </div>
+                <div class="input-box animation" style="--i:20; --j:3">
+                    <input type="password" name="password" required>
+                    <label for="">Password</label>
+                    <i class='bx bxs-lock-alt'></i>
+                </div>
+                <div class="input-box animation" style="--i:21; --j:4">
+                    <input type="password" name="password_confirmation" required>
+                    <label for="">Confirm Password</label>
+                    <i class='bx bxs-lock-alt'></i>
+                </div>
+                <button type="submit" class="btn animation" style="--i:22; --j:5">Sign Up</button>
+                <div class="linkTxt animation" style="--i:22; --j:6">
+                    <p>Already have an account? <a href="#" class="login-link">Login</a></p>
+                </div>
+            </form>
+        </div>
+        <div class="info-text register">
+            <h2 class="animation" style="--i:17; --j:0;">Welcome</h2>
+            <p class="animation" style="--i:18; --j:1;">Create an account to start your language learning journey!</p>
+        </div>
     </div>
 
-    <!-- Form đăng nhập -->
-    <div id="loginForm" class="card">
-      <div class="card-body">
-        <h3 class="card-title text-center">Đăng Nhập</h3>
-        <form action="{{ route('login') }}" method="POST">
-          @csrf
-          <!-- Hiển thị lỗi nếu có -->
-          @if($errors->has('email'))
-            <div class="alert alert-danger">
-              {{ $errors->first('email') }}
-            </div>
-          @endif
-          <div class="form-group">
-            <label for="loginEmail">Email</label>
-            <input type="email" name="email" id="loginEmail" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label for="loginPassword">Mật khẩu</label>
-            <input type="password" name="password" id="loginPassword" class="form-control" required>
-          </div>
-          <button type="submit" class="btn btn-primary btn-block">Đăng Nhập</button>
-        </form>
-      </div>
-    </div>
-
-    <!-- Form đăng ký (ẩn ban đầu) -->
-    <div id="registerForm" class="card" style="display: none;">
-      <div class="card-body">
-        <h3 class="card-title text-center">Đăng Ký</h3>
-        <form action="{{ route('register') }}" method="POST">
-          @csrf
-          @if($errors->any())
-            <div class="alert alert-danger">
-              <ul>
-                @foreach ($errors->all() as $error)
-                  <li>{{ $error }}</li>
-                @endforeach
-              </ul>
-            </div>
-          @endif
-          <div class="form-group">
-            <label for="registerName">Họ và tên</label>
-            <input type="text" name="name" id="registerName" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label for="registerEmail">Email</label>
-            <input type="email" name="email" id="registerEmail" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label for="registerPassword">Mật khẩu</label>
-            <input type="password" name="password" id="registerPassword" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label for="registerPasswordConfirmation">Xác nhận mật khẩu</label>
-            <input type="password" name="password_confirmation" id="registerPasswordConfirmation" class="form-control" required>
-          </div>
-          <button type="submit" class="btn btn-success btn-block">Đăng Ký</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- JS để chuyển đổi giữa form đăng nhập và đăng ký -->
-  <script>
-    document.getElementById('btnLogin').addEventListener('click', function() {
-      document.getElementById('loginForm').style.display = 'block';
-      document.getElementById('registerForm').style.display = 'none';
-      this.classList.replace('btn-secondary', 'btn-primary');
-      document.getElementById('btnRegister').classList.replace('btn-primary', 'btn-secondary');
-    });
-    document.getElementById('btnRegister').addEventListener('click', function() {
-      document.getElementById('loginForm').style.display = 'none';
-      document.getElementById('registerForm').style.display = 'block';
-      this.classList.replace('btn-secondary', 'btn-primary');
-      document.getElementById('btnLogin').classList.replace('btn-primary', 'btn-secondary');
-    });
-  </script>
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.querySelector('.register-link').addEventListener('click', function() {
+            document.querySelector('.login').style.display = 'none';
+            document.querySelector('.register').style.display = 'block';
+        });
+        document.querySelector('.login-link').addEventListener('click', function() {
+            document.querySelector('.register').style.display = 'none';
+            document.querySelector('.login').style.display = 'block';
+        });
+    </script>
+    <script src="script.js"></script>
 </body>
-</html>
+
+<!---- Script ---->
+<script>
+    const wrapper = document.querySelector('.wrapper')
+    const registerLink = document.querySelector('.register-link')
+    const loginLink = document.querySelector('.login-link')
+
+    registerLink.onclick = () => {
+        wrapper.classList.add('active')
+    }
+
+    loginLink.onclick = () => {
+        wrapper.classList.remove('active')
+    }   
+</script>
+<!-- CSS -->
+ <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+    :root{
+        --white: #ffffff;
+        --black: #000; 
+        --lightBulue: #17a;
+    }
+
+    *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    body{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: linear-gradient(110deg, #EEEEEE 60%, #FFFFFF 60%);
+    }
+
+    .wrapper{
+        position: relative;
+        width: 750px;
+        height: 475px;
+        background: var(--white);
+        border: 2px solid var(--black);
+        border-radius: 10px;
+        box-shadow: 0 0 20px var(--black);
+        overflow: hidden;
+    }
+
+
+    .wrapper .form-box{
+        position: absolute;
+        top: 0;
+        width: 50%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .wrapper .form-box.login{
+        left: 0;
+        padding: 0 60px 0 40px;
+    }
+
+    .form-box h2{
+        margin-bottom: 10px;
+        position: relative;
+        font-size: 32px;
+        color: var(--black);
+        text-align: center;
+    }
+
+    .form-box h2::after{
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 4px;
+        background: var(--black);
+    }
+
+    .form-box .input-box{
+        position: relative;
+        width: 100%;
+        height: 50px;
+        margin: 25px 0;
+    }
+
+    .input-box input{
+        width: 100%;
+        height: 100%;
+        background: transparent;
+        color: var(--black);
+        font-size: 16px;
+        font-weight: 500;
+        border: none;
+        outline: none;
+        border-bottom: 2px solid var(--black);
+        transition: .5s;
+        padding-right: 23px;
+    }
+
+    .input-box input:focus,
+    .input-box input:valid{
+        border-bottom-color: var(--lightBulue);
+    }
+
+    .input-box label{
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        font-size: 16px;
+        color: var(--black);
+        pointer-events: none;
+        transition: 0.5s;
+    }
+
+
+    .input-box input:focus~label,
+    .input-box input:valid~label{
+        top: -5px;
+        color: var(--lightBulue);
+    }
+
+
+    .input-box i{
+        position: absolute;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        font-size: 18px;
+        transition: 0.5s;
+    }
+
+    .input-box input:focus~i,
+    .input-box input:valid~i{
+        color: var(--lightBulue);
+    }
+
+    form button{
+        width: 100%;
+        height: 45px;
+        background-color: var(--black);
+        color: var(--white);
+        border: none;
+        outline: none;
+        border-radius: 40px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        transition: .3s;
+    }
+
+    form button:hover{
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    }
+
+    form .linkTxt{
+        font-size: 14px;
+        color: var(--black);
+        text-align: center;
+        margin: 20px 0 10px;
+    }
+
+    .linkTxt p a{
+        color: blue;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .wrapper .form-box.login .animation{
+        transform: translateX(0);
+        transition: 0.7s ease;
+        opacity: 1;
+        filter: blur(0);
+        transition-delay: calc(.1s * var(--j));
+    }
+
+
+    .wrapper.active .form-box.login .animation{
+        transform: translateX(-120%);
+        opacity: 0;
+        filter: blur(10px);
+        transition-delay: calc(.1s * var(--i));
+    }
+
+
+
+
+
+
+    .wrapper .info-text{
+        position: absolute;
+        top: 0;
+        width: 50%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .wrapper .info-text.login{
+        right: 0;
+        text-align: right;
+        padding: 0 40px 60px 150px;
+
+    }
+
+    .wrapper .info-text h2{
+        font-size: 36px;
+        color: var(--white);
+        line-height: 1.3;
+        text-transform: uppercase;
+    }
+
+    .wrapper .info-text p{
+        font-size: 16px;
+        color: var(--white);
+    }
+
+
+    .wrapper .info-text.login .animation{
+        transform: translateX(0);
+        opacity: 1;
+        filter: blur(0);
+        transition: 0.7s ease;
+        transition-delay: calc(.1s * var(--j));
+    }
+    .wrapper.active .info-text.login .animation{
+        transform: translateX(120px);
+        opacity: 0;
+        filter: blur(10px);
+        transition: 0.7s ease;
+        transition-delay: calc(.1s * var(--i));
+    }
+
+
+
+
+
+    .wrapper .rotate-bg{
+        position: absolute;
+        top: -4px;
+        right: 0;
+        width: 850px;
+        height: 600px;
+        background: #DD0000;
+        transform: rotate(10deg) skewY(40deg);
+        transform-origin: bottom right;
+        transition: 1.5s ease;
+        transition-delay: 1.6s;
+    }
+
+    .wrapper.active .rotate-bg{
+        transform: rotate(0) skewY(0);
+        transition-delay: 0.5s;
+    }
+
+    .wrapper .form-box.register{
+        padding: 0 40px 0 60px;
+        right: 0;
+    }
+
+    .wrapper.active .form-box.register{
+        pointer-events: auto;
+    }
+
+
+    .wrapper .form-box.register .animation{
+        transform: translateX(120%);
+        opacity: 0;
+        filter: blur(10px);
+        transition: .7s ease;
+        transition-delay: calc(.1s * var(--j));
+    }
+
+    .wrapper.active .form-box.register .animation{
+        transform: translateX(0);
+        opacity: 1;
+        filter: blur(0);
+        transition-delay: calc(.1s * var(--i));
+    }
+
+
+
+    .wrapper .info-text.register{
+        left: 0;
+        text-align: left;
+        padding: 0 150px 60px 40px;
+        pointer-events: none;
+    }
+
+    .wrapper.active .info-text.register{
+        pointer-events: auto;
+    }
+
+
+    .wrapper .info-text.register .animation{
+        transform: translateX(-120%);
+        opacity: 0;
+        filter: blur(10px);
+        transition: .7s ease;
+        transition-delay: calc(.1s * var(--j));
+    }
+
+    .wrapper.active .info-text.register .animation{
+        transform: translateX(0);
+        opacity: 1;
+        filter: blur(0);
+        transition-delay: calc(.1s * var(--i));
+    }
+
+
+
+
+    .wrapper .rotate-bg2{
+        position: absolute;
+        top: 100%;
+        left: 250px;
+        width: 850px;
+        height: 700px;
+        background: var(--white);
+        transform: rotate(0) skewY(0);
+        transform-origin: bottom left;
+        transition: 1.5s ease;
+        transition-delay: 0.5s;
+    }
+
+    .wrapper.active .rotate-bg2{
+        transform: rotate(-11deg) skewY(-40deg);
+        transition-delay: 1.2s;
+    }
+ </style>
+</html> 

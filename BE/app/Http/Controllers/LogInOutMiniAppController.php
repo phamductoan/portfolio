@@ -37,8 +37,8 @@ class LogInOutMiniAppController extends Controller
 
         // Nếu đăng nhập thất bại, trở lại form với thông báo lỗi
         return back()->withErrors([
-            'email' => 'Email hoặc mật khẩu không đúng.',
-        ])->withInput();
+            'email' => 'Wrong Email or Password',
+        ])->withInput($request->only('email'));
     }
 
     /**
